@@ -9,5 +9,9 @@ RSpec.describe User, type: :model do
     it { expect(user).to validate_presence_of(:username) }
     it { expect(user).to validate_presence_of(:password_digest) }
     it { expect(user).to validate_uniqueness_of(:email) }
+
+    # associations
+    it { expect(user).to have_many(:games) }
+    it { expect(user).to have_many(:squares) }
   end
 end
