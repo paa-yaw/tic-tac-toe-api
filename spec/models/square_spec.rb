@@ -8,6 +8,6 @@ RSpec.describe Square, type: :model do
     it { expect(square).to validate_presence_of(:position) }
 
     # associations
-    it { expect(square).to belong_to(:user) }
+    it { expect(square).to belong_to(:game) }
   end
 end

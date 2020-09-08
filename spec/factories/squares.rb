@@ -1,7 +1,10 @@
 FactoryBot.define do
   factory :square do
-    position { 1 }
-    value { 'X' }
-    user { nil }
+    sequence :position do |n|
+      n
+    end
+    value { nil }
+    user_id { nil }
+    game { nil }
   end
 end

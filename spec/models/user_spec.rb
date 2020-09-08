@@ -11,7 +11,7 @@ RSpec.describe User, type: :model do
     it { expect(user).to validate_uniqueness_of(:email) }
 
     # associations
-    it { expect(user).to have_many(:games) }
+    it { expect(user).to have_and_belong_to_many(:games) }
     it { expect(user).to have_many(:squares) }
   end
 end

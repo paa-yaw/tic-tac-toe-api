@@ -5,6 +5,5 @@ FactoryBot.define do
       |n| "Game #{n}"
     end
     status { 'in-progress' }
-    user { nil }
   end
 end

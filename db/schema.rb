@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_07_114314) do
+ActiveRecord::Schema.define(version: 2020_09_07_223222) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -19,19 +19,25 @@ ActiveRecord::Schema.define(version: 2020_09_07_114314) do
     t.integer "duration", default: 0
     t.string "name"
     t.string "status"
-    t.bigint "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["user_id"], name: "index_games_on_user_id"
+  end
+
+  create_table "games_users", id: false, force: :cascade do |t|
+    t.bigint "game_id", null: false
+    t.bigint "user_id", null: false
+    t.index ["game_id", "user_id"], name: "index_games_users_on_game_id_and_user_id"
+    t.index ["user_id", "game_id"], name: "index_games_users_on_user_id_and_game_id"
   end
 
   create_table "squares", force: :cascade do |t|
-    t.integer "position"
+    t.integer "position", null: false
     t.string "value"
-    t.bigint "user_id", null: false
+    t.integer "user_id"
+    t.bigint "game_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["user_id"], name: "index_squares_on_user_id"
+    t.index ["game_id"], name: "index_squares_on_game_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -43,6 +49,5 @@ ActiveRecord::Schema.define(version: 2020_09_07_114314) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  add_foreign_key "games", "users"
-  add_foreign_key "squares", "users"
+  add_foreign_key "squares", "games"
 end

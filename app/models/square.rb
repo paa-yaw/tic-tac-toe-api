@@ -1,5 +1,5 @@
 class Square < ApplicationRecord
-  belongs_to :user
+  belongs_to :game
 
-  validates :position, presence: true
+  validates :position, :game_id, presence: true
 end
