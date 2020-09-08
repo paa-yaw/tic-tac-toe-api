@@ -39,12 +39,11 @@ RSpec.describe "Games", type: :request do
   describe 'PATCH#register_move' do
     let!(:game) { create(:game) }
     let!(:squares) { create_list(:square, 9, game_id: game.id, user_id: user.id) }
-    let!(:valid_params) { { value: 'O' }.to_json }
     
     context 'user registers move' do
       before do 
         game.users << user
-        patch "/games/#{game.id}/squares/#{squares.first.id}/register_move", params: valid_params, headers: headers
+        patch "/games/#{game.id}/squares/#{squares.first.id}/register_move", params: {}, headers: headers
       end
 
       it 'updates square' do
@@ -53,7 +52,23 @@ RSpec.describe "Games", type: :request do
 
       it 'square updated' do
         square = squares.first
-        expect(square.reload.value).to eq('O') 
+        expect(square.reload.value).to eq('X') 
+      end
+    end
+
+    context 'already registered move' do
+      before do 
+        squares.first.update(value: 'X')
+        game.users << user
+        patch "/games/#{game.id}/squares/#{squares.first.id}/register_move", params: {}, headers: headers
+      end
+
+      it 'returns message' do 
+        expect(json['message']).to eq('move already registered')
+      end
+
+      it 'returns status code of 200' do 
+        expect(response).to have_http_status(200)
       end
     end
   end

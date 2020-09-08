@@ -15,15 +15,22 @@ module V1
     end
 
     def register_move
-      @square.update(value: params[:value])
-      head :no_content
+      register_ai_move
+
+      if @square.value
+        json_response({ message: 'move already registered' })
+      else
+        @square.update!(value: 'X', user_id: current_user.id)
+        check_for_winner
+      end
     end
 
-
+    
     private 
 
     def set_game
       @game = current_user.games.find(params[:id])
+      @other_player = @game.users.where.not(id: current_user.id).first
     end
 
     def set_square
@@ -32,6 +39,36 @@ module V1
 
     def square_params
       params.permit(:value)
+    end
+
+    def register_ai_move
+      set_game
+      first_square = @game.squares.where(value: nil).first.id
+      last_square = @game.squares.where(value: nil).last.id
+      random_square = @game.squares.find(rand(first_square..last_square))
+
+      # to avoid already registered move
+      random_square.update!(value: 'O', user_id: @other_player.id)
+    end
+
+    # Note should be in Game model
+    def check_for_winner
+      set_game
+      if current_user.has_3_or_more_moves?(@game.id) || @other_player.has_3_or_more_moves?(@game.id)
+        if current_user.has_3_moves_in_a_row?(@game.id)
+          current_user.update(points: 1)
+          @game.update(status: 'Game Over')
+          json_response({ message: "Winner is #{current_user.username}"})
+        elsif @other_player.has_3_moves_in_a_row?(@game.id)
+          @other_player.update(points: 1)
+          @game.update(status: 'Game Over')
+          json_response({ message: "Winner is #{@other_player.username}" })
+        else
+          head :no_content
+        end
+      else
+        head :no_content
+      end
     end
   end
 end
