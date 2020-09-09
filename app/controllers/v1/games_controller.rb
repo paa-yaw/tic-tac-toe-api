@@ -17,11 +17,15 @@ module V1
     def register_move
       register_ai_move
 
-      if @square.value
-        json_response({ message: 'move already registered' })
+      if @game.is_over?
+        json_response({ message: 'This Game is Over!' })
       else
-        @square.update!(value: 'X', user_id: current_user.id)
-        check_for_winner
+        if @square.value
+          json_response({ message: 'move already registered' })
+        else
+          @square.update!(value: 'X', user_id: current_user.id)
+          check_for_winner
+        end
       end
     end
 
@@ -35,10 +39,6 @@ module V1
 
     def set_square
       @square = @game.squares.find(params[:square_id])
-    end
-
-    def square_params
-      params.permit(:value)
     end
 
     def register_ai_move
@@ -56,11 +56,11 @@ module V1
       set_game
       if current_user.has_3_or_more_moves?(@game.id) || @other_player.has_3_or_more_moves?(@game.id)
         if current_user.has_3_moves_in_a_row?(@game.id)
-          current_user.update(points: 1)
+          @game.update(winner_id: current_user.id, duration: (Time.now - @game.created_at).to_i)
           @game.update(status: 'Game Over')
           json_response({ message: "Winner is #{current_user.username}"})
         elsif @other_player.has_3_moves_in_a_row?(@game.id)
-          @other_player.update(points: 1)
+          @game.update(winner_id: @other_player.id, duration: (Time.now - @game.created_at).to_i)
           @game.update(status: 'Game Over')
           json_response({ message: "Winner is #{@other_player.username}" })
         else

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_07_223222) do
+ActiveRecord::Schema.define(version: 2020_09_08_232724) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -21,6 +21,9 @@ ActiveRecord::Schema.define(version: 2020_09_07_223222) do
     t.string "status"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "points", default: 1
+    t.bigint "winner_id"
+    t.index ["winner_id"], name: "index_games_on_winner_id"
   end
 
   create_table "games_users", id: false, force: :cascade do |t|
@@ -44,10 +47,10 @@ ActiveRecord::Schema.define(version: 2020_09_07_223222) do
     t.string "email"
     t.string "username"
     t.string "password_digest"
-    t.integer "points"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  add_foreign_key "games", "users", column: "winner_id"
   add_foreign_key "squares", "games"
 end
