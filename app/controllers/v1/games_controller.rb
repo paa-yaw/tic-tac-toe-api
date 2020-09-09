@@ -1,6 +1,6 @@
 module V1
   class GamesController < ApplicationController
-    before_action :set_game, only: [:register_move]
+    before_action :set_game, only: [:register_move, :retrieve_squares]
     before_action :set_square, only: [:register_move]
 
     def start
@@ -15,8 +15,7 @@ module V1
     end
 
     def register_move
-      register_ai_move
-
+      
       if @game.is_over?
         json_response({ message: 'This Game is Over!' })
       else
@@ -24,9 +23,14 @@ module V1
           json_response({ message: 'move already registered' })
         else
           @square.update!(value: 'X', user_id: current_user.id)
+          register_ai_move
           check_for_winner
         end
       end
+    end
+
+    def retrieve_squares 
+      json_response(@game.squares)
     end
 
     
